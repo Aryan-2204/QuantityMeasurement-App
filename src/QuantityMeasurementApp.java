@@ -1,25 +1,27 @@
+import java.util.Stack;
+
 public class QuantityMeasurementApp {
 
     public static void main(String[] args) {
 
-        String input = "madam"; // You can change this input
+        String input = "madam"; // You can change this
 
-        // Convert string to char array
-        char[] arr = input.toCharArray();
+        Stack<Character> stack = new Stack<>();
+
+        // Push all characters into stack
+        for (int i = 0; i < input.length(); i++) {
+            stack.push(input.charAt(i));
+        }
 
         boolean isPalindrome = true;
 
-        // Two-pointer approach
-        int left = 0;
-        int right = arr.length - 1;
-
-        while (left < right) {
-            if (arr[left] != arr[right]) {
+        // Pop and compare
+        for (int i = 0; i < input.length(); i++) {
+            char ch = stack.pop();
+            if (input.charAt(i) != ch) {
                 isPalindrome = false;
                 break;
             }
-            left++;
-            right--;
         }
 
         // Output result
