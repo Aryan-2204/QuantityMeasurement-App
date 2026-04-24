@@ -1,4 +1,26 @@
-class Quantity {
+public enum LengthUnit {
+
+    FEET(1.0),
+    INCHES(1.0 / 12.0),
+    YARDS(3.0),
+    CENTIMETERS(1.0 / 30.48);
+
+    private final double toFeetFactor;
+
+    LengthUnit(double toFeetFactor) {
+        this.toFeetFactor = toFeetFactor;
+    }
+
+    // 🔥 Convert TO base unit (feet)
+    public double convertToBaseUnit(double value) {
+        return value * toFeetFactor;
+    }
+
+    // 🔥 Convert FROM base unit (feet)
+    public double convertFromBaseUnit(double baseValue) {
+        return baseValue / toFeetFactor;
+    }
+}public class Quantity {
 
     private final double value;
     private final LengthUnit unit;
@@ -12,33 +34,28 @@ class Quantity {
     }
 
     private double toBaseUnit() {
-        return unit.toInches(value);
+        return unit.convertToBaseUnit(value);
     }
 
-    // ✅ UC6 method (unchanged)
+    // ✅ UC5 Conversion
+    public Quantity convertTo(LengthUnit targetUnit) {
+        double baseValue = this.toBaseUnit();
+        double result = targetUnit.convertFromBaseUnit(baseValue);
+        return new Quantity(result, targetUnit);
+    }
+
+    // ✅ UC6 Addition (first operand unit)
     public Quantity add(Quantity other) {
-        if (other == null) {
-            throw new IllegalArgumentException("Other quantity cannot be null");
-        }
-
-        double sumInBase = this.toBaseUnit() + other.toBaseUnit();
-        double resultValue = this.unit.fromInches(sumInBase);
-
-        return new Quantity(resultValue, this.unit);
+        double sum = this.toBaseUnit() + other.toBaseUnit();
+        double result = this.unit.convertFromBaseUnit(sum);
+        return new Quantity(result, this.unit);
     }
 
-    // 🔥 UC7 method (NEW)
+    // ✅ UC7 Addition (explicit target unit)
     public Quantity add(Quantity other, LengthUnit targetUnit) {
-        if (other == null || targetUnit == null) {
-            throw new IllegalArgumentException("Invalid input");
-        }
-
-        double sumInBase = this.toBaseUnit() + other.toBaseUnit();
-
-        // Convert to EXPLICIT target unit
-        double resultValue = targetUnit.fromInches(sumInBase);
-
-        return new Quantity(resultValue, targetUnit);
+        double sum = this.toBaseUnit() + other.toBaseUnit();
+        double result = targetUnit.convertFromBaseUnit(sum);
+        return new Quantity(result, targetUnit);
     }
 
     @Override
@@ -47,7 +64,6 @@ class Quantity {
         if (!(obj instanceof Quantity)) return false;
 
         Quantity other = (Quantity) obj;
-
         return Double.compare(this.toBaseUnit(), other.toBaseUnit()) == 0;
     }
 
@@ -63,25 +79,20 @@ public class QuantityMeasurementApp {
         Quantity q1 = new Quantity(1.0, LengthUnit.FEET);
         Quantity q2 = new Quantity(12.0, LengthUnit.INCHES);
 
-        // ✅ Target = FEET
-        System.out.println(q1.add(q2, LengthUnit.FEET));   // 2 FEET
+        // ✅ Conversion
+        System.out.println(q1.convertTo(LengthUnit.INCHES)); // 12 inches
 
-        // ✅ Target = INCHES
-        System.out.println(q1.add(q2, LengthUnit.INCHES)); // 24 INCHES
+        // ✅ Equality
+        System.out.println(q1.equals(q2)); // true
 
-        // ✅ Target = YARDS
-        System.out.println(q1.add(q2, LengthUnit.YARDS));  // ~0.667 YARDS
+        // ✅ UC6 Add
+        System.out.println(q1.add(q2)); // 2 feet
 
-        // ✅ Different case
-        Quantity q3 = new Quantity(36.0, LengthUnit.INCHES);
-        Quantity q4 = new Quantity(1.0, LengthUnit.YARDS);
+        // ✅ UC7 Add with target
+        System.out.println(q1.add(q2, LengthUnit.YARDS)); // ~0.667 yards
 
-        System.out.println(q3.add(q4, LengthUnit.FEET));   // 6 FEET
-
-        // ✅ CM example
-        Quantity q5 = new Quantity(2.54, LengthUnit.CENTIMETERS);
-        Quantity q6 = new Quantity(1.0, LengthUnit.INCHES);
-
-        System.out.println(q5.add(q6, LengthUnit.CENTIMETERS)); // ~5.08 CM
+        // ✅ CM test
+        Quantity q3 = new Quantity(2.54, LengthUnit.CENTIMETERS);
+        System.out.println(q3.convertTo(LengthUnit.INCHES)); // ~1 inch
     }
 }
