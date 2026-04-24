@@ -1,35 +1,15 @@
-import java.util.*;
-
 public class QuantityMeasurementApp {
 
     public static void main(String[] args) {
 
-        String input = "madam"; // change input if needed
+        Quantity q1 = new Quantity(1.0, LengthUnit.YARDS);
+        Quantity q2 = new Quantity(3.0, LengthUnit.FEET);
 
-        Queue<Character> queue = new LinkedList<>();
-        Stack<Character> stack = new Stack<>();
+        System.out.println("Equal: " + q1.equals(q2));
 
-        // Enqueue and Push
-        for (char c : input.toCharArray()) {
-            queue.add(c);     // FIFO
-            stack.push(c);    // LIFO
-        }
+        Quantity q3 = new Quantity(1.0, LengthUnit.CENTIMETERS);
+        Quantity q4 = new Quantity(0.393701, LengthUnit.INCHES);
 
-        boolean isPalindrome = true;
-
-        // Compare dequeue vs pop
-        while (!queue.isEmpty()) {
-            if (queue.remove() != stack.pop()) {
-                isPalindrome = false;
-                break;
-            }
-        }
-
-        // Output
-        if (isPalindrome) {
-            System.out.println(input + " is a Palindrome");
-        } else {
-            System.out.println(input + " is NOT a Palindrome");
-        }
+        System.out.println("Equal: " + q3.equals(q4));
     }
 }
