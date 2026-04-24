@@ -1,30 +1,31 @@
-import java.util.Stack;
+import java.util.*;
 
 public class QuantityMeasurementApp {
 
     public static void main(String[] args) {
 
-        String input = "madam"; // You can change this
+        String input = "madam"; // change input if needed
 
+        Queue<Character> queue = new LinkedList<>();
         Stack<Character> stack = new Stack<>();
 
-        // Push all characters into stack
-        for (int i = 0; i < input.length(); i++) {
-            stack.push(input.charAt(i));
+        // Enqueue and Push
+        for (char c : input.toCharArray()) {
+            queue.add(c);     // FIFO
+            stack.push(c);    // LIFO
         }
 
         boolean isPalindrome = true;
 
-        // Pop and compare
-        for (int i = 0; i < input.length(); i++) {
-            char ch = stack.pop();
-            if (input.charAt(i) != ch) {
+        // Compare dequeue vs pop
+        while (!queue.isEmpty()) {
+            if (queue.remove() != stack.pop()) {
                 isPalindrome = false;
                 break;
             }
         }
 
-        // Output result
+        // Output
         if (isPalindrome) {
             System.out.println(input + " is a Palindrome");
         } else {
